@@ -1,10 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as cp from 'child_process';
-import { ExtensionContext, extensions, commands, workspace, l10n } from 'vscode';
+import { ExtensionContext, extensions, l10n } from 'vscode';
 import { CodeForIBMi } from '@halcyontech/vscode-ibmi-types';
 import { ComponentsTreeDataProvider } from './explorer/componentsTreeDataProvider';
 import { AiSimilarityResultsProvider } from './explorer/aiSimilarityResultsProvider';
+import axios from 'axios';
+
+const outputChannel = vscode.window.createOutputChannel('AI-powered code similarity detection and analysis');
 
 export let code4i: CodeForIBMi;
 export let extensionContext: ExtensionContext;
@@ -32,15 +35,12 @@ export function activate(context: vscode.ExtensionContext) {
 
         vscode.window.showInformationMessage('Flask server started!');
 
-        // Open the webview
         const panel = vscode.window.createWebviewPanel(
             'aiSearchSimilarities',
             'AI Search Similarities',
             vscode.ViewColumn.One,
             { enableScripts: true }
         );
-
-        // Set a custom icon for the webview panel
         panel.iconPath = {
             light: vscode.Uri.file(path.join(context.extensionPath, 'resources', 'light', 'icon.png')),
             dark: vscode.Uri.file(path.join(context.extensionPath, 'resources', 'dark', 'icon.png'))
@@ -79,8 +79,40 @@ export function activate(context: vscode.ExtensionContext) {
             );
 
             panel.webview.html = (await vscode.workspace.fs.readFile(webviewPath)).toString();
+
+            panel.webview.onDidReceiveMessage(async (message) => {
+                if (message.command === 'search') {
+                    const sourceCode = message.sourceCode;
+                    const results = await performAISearch(sourceCode);
+
+                    panel.webview.postMessage({ command: 'displayResults', results });
+                }
+            });
         })
     );
+
+    async function performAISearch(sourceCode: string): Promise<string[]> {
+        try {
+            const response = await axios.post('http://localhost:5000/search', { sourceCode });
+            return response.data.results;
+        } catch (error) {
+            console.error('Error fetching AI search results:', error);
+            throw new Error('Failed to fetch AI search results.');
+        }
+    }
+
+    // Example command to show results in the output channel
+    const disposable = vscode.commands.registerCommand('aiSimilarity.showResults', () => {
+        // Example output
+        outputChannel.appendLine('Similarity Results:');
+        outputChannel.appendLine('1. Function A is 90% similar to Function B');
+        outputChannel.appendLine('2. Function C is 85% similar to Function D');
+
+        // Show the output channel
+        outputChannel.show();
+    });
+
+    context.subscriptions.push(disposable);
 }
 
 export function deactivate() {
@@ -88,3 +120,4 @@ export function deactivate() {
         serverProcess.kill();
     }
 }
+

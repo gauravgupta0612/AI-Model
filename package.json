@@ -4,7 +4,7 @@
   "description": "AI-powered code similarity detection and analysis",
   "publisher": "Gaurav Gupta",
   "version": "1.0.0",
-  "icon": "media/download.jpg",
+  "icon": "$(file-code)",
   "engines": {
     "vscode": "^1.99.0"
   },
@@ -37,10 +37,6 @@
         {
           "id": "componentsView",
           "name": "Similarity Explorer"
-        },
-        {
-          "id": "aiSimilarityResults",
-          "name": "AI Similarity Results"
         }
       ]
     },
@@ -63,9 +59,9 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "icon": "images/images.png",
           "id": "similarity-ai",
-          "title": "AI Search Similarities"
+          "title": "AI Search Similarities",
+          "icon": "images/images.png"
         },
         {
           "id": "similarityExplorer",
@@ -73,8 +69,7 @@
           "icon": "media/download.jpg"
         }
       ],
-      "panel": [
-      ] 
+      "panel": []
     },
     "commands": [
       {
@@ -83,7 +78,6 @@
       }
     ]
   },
-
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
@@ -95,7 +89,6 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"
-    
   },
   "devDependencies": {
     "@arcad/vscode-arcad-utils": "^1.0.18-SNAPSHOT",

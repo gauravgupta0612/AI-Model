@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from transformers import RobertaTokenizer, RobertaModel
 import torch
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity # type: ignore
 
 app = Flask(__name__)
 
