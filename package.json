@@ -37,6 +37,10 @@
         {
           "id": "componentsView",
           "name": "Similarity Explorer"
+        },
+        {
+          "id": "aiSimilarityResults",
+          "name": "AI Similarity Results"
         }
       ]
     },

@@ -4,6 +4,7 @@ import * as cp from 'child_process';
 import { ExtensionContext, extensions, commands, workspace, l10n } from 'vscode';
 import { CodeForIBMi } from '@halcyontech/vscode-ibmi-types';
 import { ComponentsTreeDataProvider } from './explorer/componentsTreeDataProvider';
+import { AiSimilarityResultsProvider } from './explorer/aiSimilarityResultsProvider';
 
 export let code4i: CodeForIBMi;
 export let extensionContext: ExtensionContext;
@@ -59,6 +60,26 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('componentsView.refresh', () => componentsTreeDataProvider.refresh())
+    );
+
+    const aiSimilarityResultsProvider = new AiSimilarityResultsProvider();
+    vscode.window.registerTreeDataProvider('aiSimilarityResults', aiSimilarityResultsProvider);
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('aiSimilarityResults.openWebview', async (node) => {
+            const panel = vscode.window.createWebviewPanel(
+                'aiSimilarityResult',
+                `Similarity Result: ${node.label}`,
+                vscode.ViewColumn.One,
+                { enableScripts: true }
+            );
+
+            const webviewPath = vscode.Uri.file(
+                path.join(context.extensionPath, 'src', 'web-views', 'code-similarity-ui.html')
+            );
+
+            panel.webview.html = (await vscode.workspace.fs.readFile(webviewPath)).toString();
+        })
     );
 }
 
