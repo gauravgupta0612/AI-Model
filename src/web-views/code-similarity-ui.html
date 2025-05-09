@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Similarity Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Code Similarity Search</h1>
+    <textarea id="sourceCode" placeholder="Enter your source code here..."></textarea>
+    <button onclick="searchSimilarity()">Search</button>
+    <div class="results" id="results">
+        <h2>Results:</h2>
+        <p id="similarityRange">Similarity Range: </p>
+        <p id="mostSimilarCode">Most Similar Code: </p>
+    </div>
+
+    <script>
+        async function searchSimilarity() {
+            const sourceCode = document.getElementById('sourceCode').value;
+            if (!sourceCode) {
+                alert('Please enter source code to search.');
+                return;
+            }
+
+            const response = await fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ source: sourceCode })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('similarityRange').textContent = `Similarity Range: ${data.similarityRange}`;
+                document.getElementById('mostSimilarCode').textContent = `Most Similar Code: ${data.mostSimilarCode}`;
+            } else {
+                alert('Error fetching similarity results.');
+            }
+        }
+    </script>
+</body>
+</html>
