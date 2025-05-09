@@ -46,6 +46,7 @@ const vscode = __importStar(__webpack_require__(1));
 const path = __importStar(__webpack_require__(2));
 const cp = __importStar(__webpack_require__(3));
 const vscode_1 = __webpack_require__(1);
+const componentsTreeDataProvider_1 = __webpack_require__(4);
 let serverProcess;
 function activate(context) {
     exports.extensionContext = context;
@@ -74,6 +75,9 @@ function activate(context) {
         panel.webview.html = (await vscode.workspace.fs.readFile(webviewPath)).toString();
     });
     context.subscriptions.push(startCommand);
+    const componentsTreeDataProvider = new componentsTreeDataProvider_1.ComponentsTreeDataProvider();
+    vscode.window.registerTreeDataProvider('componentsView', componentsTreeDataProvider);
+    context.subscriptions.push(vscode.commands.registerCommand('componentsView.refresh', () => componentsTreeDataProvider.refresh()));
 }
 function deactivate() {
     if (serverProcess) {
@@ -99,6 +103,87 @@ module.exports = require("path");
 /***/ ((module) => {
 
 module.exports = require("child_process");
+
+/***/ }),
+/* 4 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ComponentsTreeDataProvider = exports.ComponentNode = void 0;
+const vscode = __importStar(__webpack_require__(1));
+class ComponentNode {
+    label;
+    children;
+    constructor(label, children = []) {
+        this.label = label;
+        this.children = children;
+    }
+}
+exports.ComponentNode = ComponentNode;
+class ComponentsTreeDataProvider {
+    _onDidChangeTreeData = new vscode.EventEmitter();
+    onDidChangeTreeData = this._onDidChangeTreeData.event;
+    components = [
+        new ComponentNode('Component 1', [
+            new ComponentNode('Subcomponent 1.1'),
+            new ComponentNode('Subcomponent 1.2')
+        ]),
+        new ComponentNode('Component 2', [
+            new ComponentNode('Subcomponent 2.1')
+        ])
+    ];
+    getTreeItem(element) {
+        const treeItem = new vscode.TreeItem(element.label, element.children.length ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
+        return treeItem;
+    }
+    getChildren(element) {
+        if (element) {
+            return element.children;
+        }
+        else {
+            return this.components;
+        }
+    }
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
+}
+exports.ComponentsTreeDataProvider = ComponentsTreeDataProvider;
+
 
 /***/ })
 /******/ 	]);

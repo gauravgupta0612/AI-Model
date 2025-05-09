@@ -33,6 +33,10 @@
         {
           "id": "projectRulesExplorer",
           "name": "AI Search Similarities"
+        },
+        {
+          "id": "componentsView",
+          "name": "Similarity Explorer"
         }
       ]
     },
@@ -58,6 +62,11 @@
           "icon": "images/images.png",
           "id": "similarity-ai",
           "title": "AI Search Similarities"
+        },
+        {
+          "id": "similarityExplorer",
+          "title": "Similarity Explorer",
+          "icon": "media/download.jpg"
         }
       ],
       "panel": [
